@@ -71,7 +71,7 @@ public class EmailWriterService {
         if(emailRequest.getTone()!=null&&!emailRequest.getTone().isEmpty()){
             prompt.append("Use a ").append(emailRequest.getTone()).append(" tone.");
         }
-        prompt.append("\nOriginal email: \n").append(emailRequest.getEmailContent());
+        prompt.append("\nOriginal email : \n").append(emailRequest.getEmailContent());
         return prompt.toString();
     }
 }
