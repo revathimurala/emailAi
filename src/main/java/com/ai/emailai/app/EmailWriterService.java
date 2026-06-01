@@ -1,10 +1,6 @@
 package com.ai.emailai.app;
 
-
-
-import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import tools.jackson.databind.JsonNode;
@@ -71,7 +67,7 @@ public class EmailWriterService {
         if(emailRequest.getTone()!=null&&!emailRequest.getTone().isEmpty()){
             prompt.append("Use a ").append(emailRequest.getTone()).append(" tone.");
         }
-        prompt.append("\nOriginal email : \n").append(emailRequest.getEmailContent());
+        prompt.append("\nOriginal email: \n").append(emailRequest.getEmailContent());
         return prompt.toString();
     }
 }
