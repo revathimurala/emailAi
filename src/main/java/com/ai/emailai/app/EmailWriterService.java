@@ -40,7 +40,7 @@ public class EmailWriterService {
                return extractResponse(response);
            }catch(Exception e){
                e.printStackTrace();
-               return "ERROR: " + e.getMessage();
+               return "ERROR:" + e.getMessage();
            }
 
 
