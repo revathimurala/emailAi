@@ -14,7 +14,7 @@ public class EmailWriterController {
     private final EmailWriterService emailWriterService;
     @PostMapping("/generate")
     public ResponseEntity<String> generateEmail(@RequestBody EmailRequest emailRequest){
-        String response = emailWriterService.generateEmailReply(emailRequest);
+        String response =emailWriterService.generateEmailReply(emailRequest);
         return ResponseEntity.ok(response);
     }
 }
