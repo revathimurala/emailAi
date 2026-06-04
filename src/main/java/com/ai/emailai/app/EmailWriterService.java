@@ -3,9 +3,10 @@ package com.ai.emailai.app;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class EmailWriterService {
@@ -22,15 +23,17 @@ public class EmailWriterService {
     public String generateEmailReply (EmailRequest emailRequest){
            String prompt=buildPrompt(emailRequest);
            Map<String,Object> requestBody=Map.of(
-                   "contents",list.of(
-                           Map.of("parts",list.of(
-                                   Map.of("text",prompt)
-                           ))
-                        )
+                   "contents",new Object[]{
+                           Map.of(
+                                   "parts",new Object[]{
+                                           Map.of("text", prompt)
+                                   }
+                           )
+                   }
            );
-           String response="";
+           String res="";
            try {
-               response = webClient.post()
+               res = webClient.post()
                         .uri(geminiApiUrl + geminiApiKey)
                         .header("Content-type", "application/json")
                         .bodyValue(requestBody)
@@ -45,7 +48,7 @@ public class EmailWriterService {
                         )
                         .bodyToMono(String.class)
                         .block();
-               return extractResponse(response);
+               return extractResponse(res);
            }catch(Exception e){
                e.printStackTrace();
                return "ERROR:" + e.getMessage();
