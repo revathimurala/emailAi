@@ -1,6 +1,8 @@
 package com.ai.emailai.app;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
@@ -23,34 +25,32 @@ public class EmailWriterService {
     public String generateEmailReply (EmailRequest emailRequest){
            String prompt=buildPrompt(emailRequest);
            Map<String,Object> requestBody=Map.of(
-                   "contents",new Object[]{
-                           Map.of(
-                                   "parts",new Object[]{
-                                           Map.of("text", prompt)
-                                   }
-                           )
-                   }
+                   "contents",List.of(
+                           Map.of("parts",List.of(
+                                   Map.of("text",prompt)
+                           ))
+                        )
            );
            String res="";
            try {
                res = webClient.post()
-                        .uri(geminiApiUrl + geminiApiKey)
-                        .header("Content-type", "application/json")
-                        .bodyValue(requestBody)
-                        .retrieve()
-                        .onStatus(
-                            status -> status.isError(),
-                            response -> response.bodyToMono(String.class)
-                                .flatMap(errorBody -> {
-                                    System.out.println("Gemini Error: " + errorBody);
-                                    return Mono.error(new RuntimeException(errorBody));
-                                })
-                        )
-                        .bodyToMono(String.class)
-                        .block();
+                       .uri(geminiApiUrl + geminiApiKey)
+                       .contentType(MediaType.APPLICATION_JSON)
+                       .bodyValue(requestBody)
+                       .retrieve()
+                       .onStatus(
+                               HttpStatusCode::isError,
+                               clientResponse -> clientResponse
+                                       .bodyToMono(String.class)
+                                       .flatMap(errorBody -> {
+                                           System.out.println("GEMINI ERROR: " + errorBody);
+                                           return Mono.error(new RuntimeException(errorBody));
+                                       })
+                       )
+                       .bodyToMono(String.class)
+                       .block();
                return extractResponse(res);
            }catch(Exception e){
-               e.printStackTrace();
                return "ERROR:" + e.getMessage();
            }
 
