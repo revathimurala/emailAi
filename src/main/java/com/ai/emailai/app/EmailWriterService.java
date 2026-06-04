@@ -34,7 +34,7 @@ public class EmailWriterService {
            String res="";
            try {
                res = webClient.post()
-                       .uri(geminiApiUrl + geminiApiKey)
+                       .uri(geminiApiUrl + "?key=" + geminiApiKey)
                        .contentType(MediaType.APPLICATION_JSON)
                        .bodyValue(requestBody)
                        .retrieve()
@@ -49,6 +49,14 @@ public class EmailWriterService {
                        )
                        .bodyToMono(String.class)
                        .block();
+//               res = webClient.post()
+//                       .uri(geminiApiUrl + geminiApiKey)
+//                       .contentType(MediaType.APPLICATION_JSON)
+//                       .bodyValue(requestBody)
+//                       .retrieve()
+//
+//                       .bodyToMono(String.class)
+//                       .block();
                return extractResponse(res);
            }catch(Exception e){
                return "ERROR:" + e.getMessage();
