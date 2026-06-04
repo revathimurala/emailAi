@@ -22,21 +22,29 @@ public class EmailWriterService {
     public String generateEmailReply (EmailRequest emailRequest){
            String prompt=buildPrompt(emailRequest);
            Map<String,Object> requestBody=Map.of(
-                   "contents",new Object[]{
-                           Map.of("parts",new Object[]{
+                   "contents",list.of(
+                           Map.of("parts",list.of(
                                    Map.of("text",prompt)
-                           })
-                   }
+                           ))
+                        )
            );
            String response="";
            try {
                response = webClient.post()
-                       .uri(geminiApiUrl + geminiApiKey)
-                       .header("Content-type", "application/json")
-                       .bodyValue(requestBody)
-                       .retrieve()
-                       .bodyToMono(String.class)
-                       .block();
+                        .uri(geminiApiUrl + geminiApiKey)
+                        .header("Content-type", "application/json")
+                        .bodyValue(requestBody)
+                        .retrieve()
+                        .onStatus(
+                            status -> status.isError(),
+                            response -> response.bodyToMono(String.class)
+                                .flatMap(errorBody -> {
+                                    System.out.println("Gemini Error: " + errorBody);
+                                    return Mono.error(new RuntimeException(errorBody));
+                                })
+                        )
+                        .bodyToMono(String.class)
+                        .block();
                return extractResponse(response);
            }catch(Exception e){
                e.printStackTrace();
